@@ -1,0 +1,51 @@
+<%doc>
+  Base template; contains the basic site layout
+</%doc>
+<% messages = get_flashed_messages(category_filter=["message"]) %>
+<% errors = get_flashed_messages(category_filter=["error"]) %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An alarm clock made with love for my wife.">
+
+    <title>Sunshine Alarm: With love for Katie</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/alarm.css">
+  </head>
+  <body>
+    <!-- Bootstrap core JavaScript -->
+    <script src="static/js/jquery-1.10.2.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+
+    ## -- Navbar
+    <%include file="navbar.html"/>
+
+    ## -- Flashed Messages
+    <div class="container">
+      % for message in messages:
+        <div class="alert alert-success">
+          <p class="lead">${message}</p>
+        </div> <!-- /messages -->
+      % endfor
+      % for error in errors:
+        <div class="alert alert-danger">
+          <p class="lead">${error}</p>
+        </div> <!-- /errors -->
+      % endfor
+
+      ## -- Render body content!
+      ${self.body()}
+    </div> <!-- /body container -->
+
+    ## -- Footer
+    <div class="container">
+      <%include file="footer.html"/>
+    </div>
+
+  </body>
+</html>

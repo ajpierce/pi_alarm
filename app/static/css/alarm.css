@@ -1,0 +1,35 @@
+.homepage-jumbotron {
+  background-color: transparent;
+  text-align: center;
+  margin-top: -50px;
+  margin-bottom: -40px;
+}
+.homepage-jumbotron h1 {
+  font-size: 1.5em;
+}
+.center-text {
+  text-align: center;
+}
+.navbar {
+  box-shadow: 0px 0px 15px #000;
+  background-color: #563d7c;
+  border-color: #463265;
+}
+.nav-justified li {
+  float: none;
+}
+.nav-justified li a {
+  color: #e5e5e5;
+}
+.nav-justified li a:hover {
+  background-color: #463265;
+}
+.nav-justified li a:focus {
+  background-color: #463265;
+}
+.navbar-nav > .active > a,
+.navbar-nav > .active > a:hover,
+.navbar-nav > .active > a:focus {
+  color: #e5e5e5;
+  background-color: #463265;
+}

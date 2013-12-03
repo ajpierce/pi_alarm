@@ -1,0 +1,33 @@
+<%doc>
+Any page that employs the navbar should have the controller pass a list of
+dictionaries to the template to help with navbar construction:
+
+[{
+  "text" : "Home"
+  "url" : "/"
+  "active" : True
+}, ... ]
+
+This list should be passed in the `navbar` variable
+</%doc>
+
+##<div class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar">
+      <ul class="nav navbar-nav nav-justified">
+##<div class="container">
+  ##<div class="masthead">
+    ##<ul class="nav nav-justified">
+        % for element in navbar:
+          % if element['active'] is True:
+            <li class="active">
+          % else:
+            <li>
+          % endif
+              <a href="${element['url']}">${element['title']}</a>
+            </li>
+        % endfor
+      </ul>
+    </div><!--/nav-collapse-->
+  </div><!--/container-->
+</div><!--/navbar-->

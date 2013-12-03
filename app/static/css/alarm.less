@@ -1,0 +1,47 @@
+// -- Variables
+@navbar_height: 50px;
+@navbar_color: #563d7c;
+@navbar_color_active: #463265;
+@navbar_text_color: #e5e5e5;
+
+// -- Website Properties
+.homepage-jumbotron {
+  background-color: transparent;
+  text-align: center;
+  margin-top: -@navbar_height;
+  margin-bottom: -40px;
+
+  h1 {
+    font-size: 1.5em;
+  }
+}
+
+.center-text {
+  text-align: center;
+}
+
+.navbar {
+  box-shadow: 0px 0px 15px #000;
+  background-color: @navbar_color;
+  border-color: @navbar_color_active;
+}
+
+.nav-justified {
+  li {
+    float: none;  // Keeps the links centered
+    a {
+      color: @navbar_text_color;
+      &:hover {
+        background-color: @navbar_color_active;
+      }
+      &:focus {
+        background-color: @navbar_color_active;
+      }
+    }
+  }
+}
+
+.navbar-nav>.active>a, .navbar-nav>.active>a:hover, .navbar-nav>.active>a:focus {
+  color: @navbar_text_color;
+  background-color: @navbar_color_active;
+}
