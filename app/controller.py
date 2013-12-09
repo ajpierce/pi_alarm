@@ -3,6 +3,7 @@ import datetime
 import os
 
 from app import app
+from apscheduler.scheduler import Scheduler
 from flask import flash, redirect, get_flashed_messages, session, \
                     url_for, request, g
 from mako.lookup import TemplateLookup
@@ -41,7 +42,7 @@ def get_alarm_data(day=None):
     if day:
         for row in rows:
             if row['day'].lower() == day.lower():
-            	return row
+                return row
 
     return rows
 
@@ -52,8 +53,8 @@ def persist_alarm_data(ad=None):
     If omitted, the global instance of the alarm is persisted
     """
     if not ad:
-    	ad = get_alarm_data()
-    	
+        ad = get_alarm_data()
+
     app_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
     alarm_csv_path = os.path.join(app_path, 'static/data/alarm.csv')
 
@@ -67,21 +68,30 @@ def persist_alarm_data(ad=None):
 # -- Global Variables
 current_day = datetime.date.today() + datetime.timedelta(days=1)
 alarm_data = get_alarm_data()
+light_on = False
+sched = Scheduler()
+sched.start()
 
 # -- Routes
 @app.route('/')
 @app.route('/index')
 @app.route('/home')
 def index():
+    global sched
+    if not sched.get_jobs():
+        reschedule()
+
     set_current_day( datetime.date.today() + datetime.timedelta(days=1) )
     return redirect(('/' + get_current_day_name()).lower())
 
 @app.route('/set_alarm', methods=['POST'])
 def set_alarm():
     global alarm_data
+
     alarm_time = request.form.get('time')
     day = get_current_day_name()
     set_alarm_data(day, alarm_time)
+    reschedule()
 
     flash("Alarm for %s set!" % day, "message")
     return redirect(('/' + day).lower())
@@ -162,7 +172,7 @@ def get_date_with_day(target_day):
     loop indefinitely! """
     day = datetime.date.today() 
     while day.strftime("%A").lower() != target_day.lower():
-    	day = day + datetime.timedelta(days=1)
+        day = day + datetime.timedelta(days=1)
 
     return day
 
@@ -215,3 +225,43 @@ def get_navbar_template():
         'url' : '/sunday',
         'active' : False
     }]
+
+# -- Scheduler and Light Functions
+def reschedule():
+    global sched
+
+    # -- First, remove all current jobs
+    jobs = sched.get_jobs()
+    for job in jobs:
+        sched.unschedule_job(job)
+
+    # -- Then, reschedule all jobs!
+    alarm_data = get_alarm_data()
+    for datum in alarm_data:
+        weekday = get_date_with_day(datum['day']).weekday()
+        hour, minute = datum['on'].split(":")
+
+        # -- Schedule "on" time
+        sched.add_cron_job(toggle_light,
+                day_of_week= weekday,
+                hour= int(hour),
+                minute= int(minute) )
+
+        # -- Schedule "off" time
+        hour, minute = datum['off'].split(":")
+        sched.add_cron_job(toggle_light,
+                day_of_week= weekday,
+                hour= int(hour),
+                minute= int(minute) )
+
+
+
+def toggle_light():
+    global light_on
+    if light_on:
+        print "Light is currently on! Turning off..."
+    else:
+        print "Light is currently off! Turning on..."
+
+    light_on = not light_on
+
