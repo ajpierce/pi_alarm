@@ -8,4 +8,8 @@
   <p class="lead">Your husband's love starts your day on a bright and shining note!</p>
   <hr/>
   <p>Set alarm for ${day}</p>
+  <form action="/set_alarm", method="POST">
+    <input name="time" type="time" value="${time}"/>
+    <input type="submit" class="btn btn-primary btn-lg"></input>
+  </form>
 </div><!-- /jumbotron -->
