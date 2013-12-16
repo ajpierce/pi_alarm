@@ -8,8 +8,12 @@ from flask import flash, redirect, get_flashed_messages, session, \
                     url_for, request, g
 from mako.lookup import TemplateLookup
 
+PROJECT_DIR = os.path.abspath( os.path.dirname(os.path.realpath(__file__)) )
+
+print "looking for templates in %s" % PROJECT_DIR + '/templates'
 template_lookup = TemplateLookup(
-    directories=['app/templates'], module_directory='/tmp/mako_modules')
+    directories=[PROJECT_DIR + '/templates'], 
+    module_directory='/tmp/mako_modules')
 
 def render(templatename, **kwargs):
     mytemplate = template_lookup.get_template(templatename)
@@ -258,10 +262,20 @@ def reschedule():
 
 def toggle_light():
     global light_on
-    if light_on:
-        print "Light is currently on! Turning off..."
-    else:
-        print "Light is currently off! Turning on..."
+    try:
+        import RPi.GPIO as GPIO
+        pin = 10
+
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, not light_on)
+
+    except Exception as exc:
+        print "ERROR: %s" % exc
+        if light_on:
+            print "Light is currently on! Turning off..."
+        else:
+            print "Light is currently off! Turning on..."
 
     light_on = not light_on
 
