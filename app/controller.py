@@ -246,36 +246,48 @@ def reschedule():
         hour, minute = datum['on'].split(":")
 
         # -- Schedule "on" time
-        sched.add_cron_job(toggle_light,
+        sched.add_cron_job(turn_light_on,
                 day_of_week= weekday,
                 hour= int(hour),
                 minute= int(minute) )
 
         # -- Schedule "off" time
         hour, minute = datum['off'].split(":")
-        sched.add_cron_job(toggle_light,
+        sched.add_cron_job(turn_light_off,
                 day_of_week= weekday,
                 hour= int(hour),
                 minute= int(minute) )
 
 
-
-def toggle_light():
-    global light_on
+@app.route('/on')
+def turn_light_on():
     try:
         import RPi.GPIO as GPIO
         pin = 10
 
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(pin, GPIO.OUT)
-        GPIO.output(pin, not light_on)
+        GPIO.output(pin, True)
 
     except Exception as exc:
         print "ERROR: %s" % exc
-        if light_on:
-            print "Light is currently on! Turning off..."
-        else:
-            print "Light is currently off! Turning on..."
+        print "Turning light on!"
 
-    light_on = not light_on
+    return redirect(('/' + get_current_day_name()).lower())
 
+
+@app.route('/off')
+def turn_light_off():
+    try:
+        import RPi.GPIO as GPIO
+        pin = 10
+
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, False)
+
+    except Exception as exc:
+        print "ERROR: %s" % exc
+        print "Turning light off!"
+
+    return redirect(('/' + get_current_day_name()).lower())
