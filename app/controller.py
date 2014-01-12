@@ -6,6 +6,7 @@ from app import app
 from apscheduler.scheduler import Scheduler
 from flask import flash, redirect, get_flashed_messages, session, \
                     url_for, request, g
+from light_driver import LightDriver
 from mako.lookup import TemplateLookup
 
 PROJECT_DIR = os.path.abspath( os.path.dirname(os.path.realpath(__file__)) )
@@ -72,7 +73,8 @@ def persist_alarm_data(ad=None):
 # -- Global Variables
 current_day = datetime.date.today() + datetime.timedelta(days=1)
 alarm_data = get_alarm_data()
-light_on = False
+light_driver = LightDriver()
+
 sched = Scheduler()
 sched.start()
 
@@ -261,33 +263,10 @@ def reschedule():
 
 @app.route('/on')
 def turn_light_on():
-    try:
-        import RPi.GPIO as GPIO
-        pin = 10
-
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(pin, GPIO.OUT)
-        GPIO.output(pin, True)
-
-    except Exception as exc:
-        print "ERROR: %s" % exc
-        print "Turning light on!"
-
+    light_driver.on()
     return redirect(('/' + get_current_day_name()).lower())
-
 
 @app.route('/off')
 def turn_light_off():
-    try:
-        import RPi.GPIO as GPIO
-        pin = 10
-
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(pin, GPIO.OUT)
-        GPIO.output(pin, False)
-
-    except Exception as exc:
-        print "ERROR: %s" % exc
-        print "Turning light off!"
-
+    light_driver.off()
     return redirect(('/' + get_current_day_name()).lower())

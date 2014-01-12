@@ -1,6 +1,10 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+# -- Light Config
+PIN = 10
+ON_DURATION = 15    # in minutes
+
 # -- General Config
 DEBUG = True
 CSRF_ENABLED = True
