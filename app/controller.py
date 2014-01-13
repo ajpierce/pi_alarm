@@ -174,3 +174,13 @@ def turn_light_on():
 def turn_light_off():
     light_driver.off()
     return redirect(('/' + get_current_day_name()).lower())
+
+@app.route('/troll')
+def troll_katie():
+    from time import sleep
+    for i in range(5):
+        turn_light_on()
+        sleep(0.13)
+        turn_light_off()
+        sleep(0.13)
+    return redirect(('/' + get_current_day_name()).lower())
