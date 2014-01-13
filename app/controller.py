@@ -1,17 +1,15 @@
-import csv
 import datetime
 import os
+import pickle
 
 from app import app
-from apscheduler.scheduler import Scheduler
-from flask import flash, redirect, get_flashed_messages, session, \
-                    url_for, request, g
+from flask import flash, redirect, get_flashed_messages, request
 from light_driver import LightDriver
 from mako.lookup import TemplateLookup
+from scheduler import Scheduler
 
 PROJECT_DIR = os.path.abspath( os.path.dirname(os.path.realpath(__file__)) )
 
-print "looking for templates in %s" % PROJECT_DIR + '/templates'
 template_lookup = TemplateLookup(
     directories=[PROJECT_DIR + '/templates'], 
     module_directory='/tmp/mako_modules')
@@ -29,88 +27,41 @@ def render(templatename, **kwargs):
         get_flashed_messages = get_flashed_messages, **kwargs)
 
 
-# -- CSV Management Functions
-def get_alarm_data(day=None):
-    """
-    Extracts alarm data from the alarm.csv file in the static/data directory.
-    Returns a list of dictionaries whose keys are the column headers.
-
-    If optional "day" agrument is passed, function will return data for only
-    the specified day
-    """
-    app_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-    alarm_csv_path = os.path.join(app_path, 'static/data/alarm.csv')
-
-    with open(alarm_csv_path) as csv_file:
-        rows = [row for row in csv.DictReader(csv_file, delimiter=',')]
-
-    if day:
-        for row in rows:
-            if row['day'].lower() == day.lower():
-                return row
-
-    return rows
-
-def persist_alarm_data(ad=None):
-    """
-    Writes the alarm data out to the alarm.csv file in the static/data
-    directory. If the optioanl alarm_data is passed, that is what's written.
-    If omitted, the global instance of the alarm is persisted
-    """
-    if not ad:
-        ad = get_alarm_data()
-
-    app_path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-    alarm_csv_path = os.path.join(app_path, 'static/data/alarm.csv')
-
-    with open(alarm_csv_path, 'wb') as csv_file:
-        alarm_writer = csv.writer(csv_file, delimiter=',',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        alarm_writer.writerow(ad[0].keys())
-        alarm_writer.writerows([ current_day.values() for current_day in ad ])
-
-
 # -- Global Variables
 current_day = datetime.date.today() + datetime.timedelta(days=1)
-alarm_data = get_alarm_data()
-light_driver = LightDriver()
 
-sched = Scheduler()
-sched.start()
+light_driver = LightDriver()
+scheduler = Scheduler()
 
 # -- Routes
 @app.route('/')
 @app.route('/index')
 @app.route('/home')
 def index():
-    global sched
-    if not sched.get_jobs():
-        reschedule()
-
     set_current_day( datetime.date.today() + datetime.timedelta(days=1) )
     return redirect(('/' + get_current_day_name()).lower())
 
 @app.route('/set_alarm', methods=['POST'])
 def set_alarm():
-    global alarm_data
-
     alarm_time = request.form.get('time')
-    day = get_current_day_name()
-    set_alarm_data(day, alarm_time)
-    reschedule()
+    weekday = get_current_day().weekday()
+    hour, minute = alarm_time.split(":")
 
+    scheduler.schedule_alarm(weekday, hour, minute)
+
+    day = get_current_day_name()
     flash("Alarm for %s set!" % day, "message")
     return redirect(('/' + day).lower())
 
 def render_day(day):
-    global alarm_data
-
     # Set the current day every time we get to this function to ensure that 
     # the day persists on form submission.
     set_current_day( get_date_with_day(day) )
+    weekday = get_current_day().weekday()
 
     # Get the time the alarm is currently set to to render it
-    alarm_time = get_alarm_data( day )['on']
+    alarm_data = pickle.load( open( app.config['ALARM_DATA'], "rb" ) )
+    alarm_time = alarm_data[weekday]['on']
 
     # Render the page
     return render( 'index.html', 
@@ -182,25 +133,6 @@ def get_date_with_day(target_day):
 
     return day
 
-def set_alarm_data(day, time):
-    """
-    For a given day (string; ex: Tuesday), takes the specified time and
-    persist it to the "on" field in the global alarm_data variable. 
-
-    Sets the "off" field to be 15 minutes after the alarm turns on, because
-    this is just a light and we want to conserve electricity!
-    """
-    global alarm_data
-    hour, minute = time.split(':')
-    alarm_time = datetime.datetime(2014, 1, 1, int(hour), int(minute))
-    for row in alarm_data:
-        if row['day'].lower() == day.lower():
-            row['on'] = alarm_time.strftime("%H:%M")
-            row['off'] = ( alarm_time + datetime.timedelta(minutes=15) \
-                    ).strftime("%H:%M")
-
-    persist_alarm_data(alarm_data)
-
 def get_navbar_template():
     return [{
         'title': 'Monday',
@@ -232,35 +164,7 @@ def get_navbar_template():
         'active' : False
     }]
 
-# -- Scheduler and Light Functions
-def reschedule():
-    global sched
-
-    # -- First, remove all current jobs
-    jobs = sched.get_jobs()
-    for job in jobs:
-        sched.unschedule_job(job)
-
-    # -- Then, reschedule all jobs!
-    alarm_data = get_alarm_data()
-    for datum in alarm_data:
-        weekday = get_date_with_day(datum['day']).weekday()
-        hour, minute = datum['on'].split(":")
-
-        # -- Schedule "on" time
-        sched.add_cron_job(turn_light_on,
-                day_of_week= weekday,
-                hour= int(hour),
-                minute= int(minute) )
-
-        # -- Schedule "off" time
-        hour, minute = datum['off'].split(":")
-        sched.add_cron_job(turn_light_off,
-                day_of_week= weekday,
-                hour= int(hour),
-                minute= int(minute) )
-
-
+# -- Light Control Routes
 @app.route('/on')
 def turn_light_on():
     light_driver.on()
