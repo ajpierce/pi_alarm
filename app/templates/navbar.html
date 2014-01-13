@@ -11,13 +11,23 @@ dictionaries to the template to help with navbar construction:
 This list should be passed in the `navbar` variable
 </%doc>
 
-##<div class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-    <div class="navbar">
+<div class="container">
+  <div class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+        % for element in navbar:
+          % if element['active'] is True:
+            <span class="navbar-brand alarm-brand visible-xs">${element['title']}</span>
+          % endif
+        % endfor
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav nav-justified">
-##<div class="container">
-  ##<div class="masthead">
-    ##<ul class="nav nav-justified">
         % for element in navbar:
           % if element['active'] is True:
             <li class="active">
@@ -28,6 +38,6 @@ This list should be passed in the `navbar` variable
             </li>
         % endfor
       </ul>
-    </div><!--/nav-collapse-->
-  </div><!--/container-->
-</div><!--/navbar-->
+    </div>
+  </div>
+</div>

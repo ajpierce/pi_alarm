@@ -20,6 +20,11 @@
   text-align: center;
 }
 
+.navbar-default .navbar-brand {
+  text-align: center;
+  color: @navbar_text_color;
+}
+
 .navbar {
   box-shadow: 0px 0px 15px #000;
   background-color: @navbar_color;
@@ -41,7 +46,10 @@
   }
 }
 
-.navbar-nav>.active>a, .navbar-nav>.active>a:hover, .navbar-nav>.active>a:focus {
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
   color: @navbar_text_color;
   background-color: @navbar_color_active;
+}
+.navbar-default .navbar-nav>li>a {
+  color: @navbar_text_color !important;
 }
