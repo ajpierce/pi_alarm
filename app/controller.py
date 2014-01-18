@@ -1,6 +1,7 @@
 import datetime
 import os
 import pickle
+import random
 
 from app import app
 from flask import flash, redirect, get_flashed_messages, request
@@ -63,11 +64,15 @@ def render_day(day):
     alarm_data = pickle.load( open( app.config['ALARM_DATA'], "rb" ) )
     alarm_time = alarm_data[weekday]['on']
 
+    # Get the random messages from the config
+    messages = app.config['MESSAGES']
+
     # Render the page
     return render( 'index.html', 
             active_tab=get_current_day().weekday(),
             day=get_current_day_name(),
-            time=alarm_time )
+            time=alarm_time,
+            message=random.choice(messages))
 
 @app.route('/monday')
 def monday():
