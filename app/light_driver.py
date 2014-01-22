@@ -10,7 +10,6 @@ class LightDriver(object):
     If you don't specify which pin to control in the constructor, the PIN
     specified in the config file is used.
     """
-    # -- Global Variables
 
     def __init__(self, pin=None):
         if not pin:
