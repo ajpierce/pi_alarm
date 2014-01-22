@@ -79,7 +79,8 @@ ALARM_DATA = '/opt/pi_alarm/pi_alarm/app/alarm_data.p`
 For testing purposes, we want to hook up the LED to make sure that the signal
 processing works before attempting to attach the Pi to the PowerSwitch Tail.
 
-I plugged the LED into Pin 10 on the Raspberry Pi, [like so](http://i.imgur.com/er2vYOV.jpg).
+I plugged the LED into Pin 10 on the Raspberry Pi, like so:
+![Pin 10 and LED](http://i.imgur.com/er2vYOV.jpg)
 
 ## Step 6: Fire up the software!
 As root,
@@ -100,7 +101,8 @@ you're in business!
 
 ## Step 7: Hook up the Pi to the PowerSwitch Tail
 After confirming that the LED lights up, I simply cut off the LED and screwed
-the two wires into the PowerSwitch Tail, [like so](http://i.imgur.com/VcjAyyh.jpg).
+the two wires into the PowerSwitch Tail, like so:
+![RPi to PST](http://i.imgur.com/VcjAyyh.jpg)
 Afterwards, I attached the Pi to the PST with a zip tie, and the hardware
 hacking was complete!
 
