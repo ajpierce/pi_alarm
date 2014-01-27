@@ -4,7 +4,10 @@ clock. The Pi is attached to a PowerSwitch Tail and controls a light in place
 of an audio-based alarm to wake us up.
 
 The alarm is configured through a web interface, and has been optimized for
-both desktop and mobile (because who sleeps with their computer?).
+both desktop and mobile.
+
+![Web](http://i.imgur.com/DHOGohY.png)
+![Mobile](http://i.imgur.com/8kUayQ4.png)
 
 I made this for my wife for Christmas 2013, and it was super simple!  After a
 month in the field, this alarm clock has received highest marks from the wife,
@@ -121,3 +124,18 @@ the alarm clock server.
 ## Step 9: Enjoy!
 Plug your light into the PowerSwitch Tail, and the PST and Alarm into a couple
 of outlets. You're done!
+
+## Changing the Appearance
+Mushy love notes to a woman you don't know not your design aesthetic? No
+problem!
+
+`app/templates/index.html` is where you can shorten the text to something
+practical.
+
+`app/static/css/alarm.less` is the LESS file that compiles to
+`app/static/css/alarm.css`, in which you may adjust the color scheme to
+something less purple.
+
+Finally, if you like the random messages that appear in the header, you can
+make your own by editing `config.py`. If you'd prefer not to have them, remove
+the tag from `app/templates/footer.html`.
