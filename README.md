@@ -4,10 +4,10 @@ clock. The Pi is attached to a PowerSwitch Tail and controls a light in place
 of an audio-based alarm to wake us up.
 
 The alarm is configured through a web interface, and has been optimized for
-both desktop and mobile.
+both desktop and mobile. Instructions for building it below!
 
 ![Web](http://i.imgur.com/DHOGohY.png)
-![Mobile](http://i.imgur.com/8kUayQ4.png)
+<img alt="Mobile" src="http://i.imgur.com/8kUayQ4.png" width=250 />
 
 I made this for my wife for Christmas 2013, and it was super simple!  After a
 month in the field, this alarm clock has received highest marks from the wife,
