@@ -11,7 +11,7 @@ python_libs=(
     'flask-mako'                # Flask integration for Mako
     'uwsgi'                     # for serving the site
     'Flask-BasicAuth'           # for locking down the site
-    'apscheduler'               # Advanced Python Scheduler
+    'python-crontab'            # for accessing the crontab
 )
 
 # Install each of the libraries

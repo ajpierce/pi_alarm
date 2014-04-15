@@ -12,7 +12,7 @@ from scheduler import Scheduler
 PROJECT_DIR = os.path.abspath( os.path.dirname(os.path.realpath(__file__)) )
 
 template_lookup = TemplateLookup(
-    directories=[PROJECT_DIR + '/templates'], 
+    directories=[PROJECT_DIR + '/templates'],
     module_directory='/tmp/mako_modules')
 
 def render(templatename, **kwargs):
@@ -55,20 +55,19 @@ def set_alarm():
     return redirect(('/' + day).lower())
 
 def render_day(day):
-    # Set the current day every time we get to this function to ensure that 
+    # Set the current day every time we get to this function to ensure that
     # the day persists on form submission.
     set_current_day( get_date_with_day(day) )
     weekday = get_current_day().weekday()
 
     # Get the time the alarm is currently set to to render it
-    alarm_data = pickle.load( open( app.config['ALARM_DATA'], "rb" ) )
-    alarm_time = alarm_data[weekday]['on']
+    alarm_time = scheduler.get_time_for_day(weekday)
 
     # Get the random messages from the config
     messages = app.config['MESSAGES']
 
     # Render the page
-    return render( 'index.html', 
+    return render( 'index.html',
             active_tab=get_current_day().weekday(),
             day=get_current_day_name(),
             time=alarm_time,
@@ -129,10 +128,10 @@ def get_date_with_day(target_day):
     """Given a string representing a day of the week, returns a datetime
     object representing the next occurrence of that day. If the current day is
     the same day as passed, it returns the current date.
-    
+
     WARNING: If you don't pass this function a day of the week, it will
     loop indefinitely! """
-    day = datetime.date.today() 
+    day = datetime.date.today()
     while day.strftime("%A").lower() != target_day.lower():
         day = day + datetime.timedelta(days=1)
 

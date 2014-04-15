@@ -1,8 +1,6 @@
-import datetime
-import pickle
+import datetime, os
 from app import app
-from apscheduler.scheduler import Scheduler as ApScheduler
-from light_driver import LightDriver
+from crontab import CronTab
 
 
 class Scheduler(object):
@@ -11,23 +9,25 @@ class Scheduler(object):
     Operates both the scheduler and persisting the data
     """
     def __init__(self):
-        self.scheduler = ApScheduler()
-        self.scheduler.start()
-        self.light_driver = LightDriver()
+        self.cron = CronTab()
 
-    def start(self):
-        self.reschedule()
-        return self.scheduler.start()
+    def get_time_for_day(self, weekday):
+        """
+        Finds the time the alarm will switch 'on' for the given weekday.
 
-    def get_jobs(self):
-        return self.scheduler.get_jobs()
+        Weekday: Integer from 0 to 6
+            + 0 is sunday
+            + 1 is monday
+            + ...
+            + 6 is saturday
+        """
+        jobs = self.cron.find_comment("ON for %s" % weekday)
+        if not jobs:
+            return ""
 
-    def unschedule_jobs(self):
-        for job in self.scheduler.get_jobs():
-            self.scheduler.unschedule_job(job)
-
-    def unscheldue_job(self, job):
-        return self.schedule.unschedule_job(job)
+        for job in jobs:
+        # -- We only care about the first job
+            return "%s:%s" % (job.hour, job.minute)
 
     def schedule_alarm(self, weekday, hour, minute):
         """
@@ -36,7 +36,7 @@ class Scheduler(object):
             + 1 is monday
             + ...
             + 6 is saturday
-        
+
         Hour: Integer from 0 to 23
             + 0 is midnight
             + 13 is 1:00 PM
@@ -45,43 +45,36 @@ class Scheduler(object):
         """
 
         # -- First, unschedule the alarm for that day
-        for job in self.scheduler.get_jobs():
-            # Field at index 4 is the day of the week integer
-            if job.trigger.fields[4] == weekday:
-                self.scheduler.unschedule_job(job)
+        self.cron.remove_all(comment="ON for %s" % weekday)
+        self.cron.remove_all(comment="OFF for %s" % weekday)
 
-        # -- Second, persist the new time to the hard drive
+        # -- Second, create new jobs
+        current_dir = os.path.abspath(\
+                os.path.dirname(os.path.realpath(__file__)) )
+        on_job = self.cron.new(command=current_dir+'/on.py',
+                comment = "ON for %s" % weekday)
+        off_job = self.cron.new(command=current_dir+'/off.py',
+                comment = "OFF for %s" % weekday)
+
+        # -- Third, calculate the alarm times
         alarm_time = datetime.datetime(2014, 1, 1, int(hour), int(minute))
         duration = app.config['ALARM_DURATION']
-        on = alarm_time.strftime("%H:%M")
-        off = (alarm_time + datetime.timedelta(minutes=int(duration))).strftime("%H:%M")
-        off_hour, off_minute = off.split(":")
+        on_time = alarm_time.strftime("%H:%M")
+        off_time = (alarm_time + \
+                datetime.timedelta(minutes=int(duration))).strftime("%H:%M")
 
-        alarm_data = pickle.load( open( app.config['ALARM_DATA'], "rb" ) )
-        alarm_data[weekday] = { 'on': on, 'off': off, 'enabled': True }
-        pickle.dump(alarm_data, open( app.config['ALARM_DATA'], "wb" ) )
+        on_hour, on_minute = on_time.split(':')
+        off_hour, off_minute = off_time.split(':')
 
-        # -- Finally, schedule the new time
-        self.scheduler.add_cron_job(self.light_driver.on,
-                day_of_week = weekday,
-                hour = int(hour),
-                minute = int(minute) )
+        # -- Finally, add the new job to the crontab
+        on_job.minute.on(on_minute)
+        on_job.hour.on(on_hour)
+        on_job.dow.on(weekday)
 
-        self.scheduler.add_cron_job(self.light_driver.off,
-                day_of_week = weekday,
-                hour = int(off_hour),
-                minute = int(off_minute) )
+        off_job.minute.on(off_minute)
+        off_job.hour.on(off_hour)
+        off_job.dow.on(weekday)
 
-        return True
-
-    def reschedule(self):
-        """
-        Gets the alarm information from the config file and adds jobs to the
-        scheduler
-        """
-        alarm_data = pickle.load( open( app.config['ALARM_DATA'], "rb" ) )
-        for weekday, datum in enumerate(alarm_data):
-            hour, minute = datum['on'].split(":")
-            self.schedule_alarm(weekday, hour, minute)
+        self.cron.write()
 
         return True
