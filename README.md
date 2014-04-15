@@ -63,19 +63,13 @@ live, and create a virtual environment:
 ```
 sudo su -
 cd /opt
-virtuanenv pi_alarm
-cd pi_alarm
+virtuanenv pi_alarm_env
+cd pi_alarm_env
 ```
 Next, check out the project from git, and install the python libraries:
 ```
 git clone git@bitbucket.org:andrewjpierce/pi_alarm.git
 ./pi_alarm/script/setup.sh
-```
-
-Finally, change the path of the ALARM_DATA in `config.py` to be the
-fully-qualified path of the install directory:
-```
-ALARM_DATA = '/opt/pi_alarm/pi_alarm/app/alarm_data.p`
 ```
 
 ## Step 5: Hook up the LED
@@ -88,7 +82,7 @@ I plugged the LED into Pin 10 on the Raspberry Pi, like so:
 ## Step 6: Fire up the software!
 As root,
 ```
-cd /opt/pi_alarm/pi_alarm
+cd /opt/pi_alarm_env/pi_alarm
 ./run.py
 ```
 
@@ -115,7 +109,7 @@ but your script will be the simple one outlined below:
 
 ```
 #!/bin/bash
-screen -S alarm python /opt/pi_alarm/pi_alarm/run.py
+screen -S alarm python /opt/pi_alarm_env/pi_alarm/run.py
 ```
 
 This starts a new screen (with the name "alarm" and invokes python to start

@@ -68,7 +68,7 @@ def render_day(day):
 
     # Render the page
     return render( 'index.html',
-            active_tab=get_current_day().isoweekday(),
+            active_tab=get_current_day().weekday(),
             day=get_current_day_name(),
             time=alarm_time,
             message=random.choice(messages))

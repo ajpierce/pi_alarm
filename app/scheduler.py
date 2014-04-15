@@ -26,8 +26,9 @@ class Scheduler(object):
             return ""
 
         for job in jobs:
-        # -- We only care about the first job
-            return "%s:%s" % (job.hour, job.minute)
+            # -- We only care about the first job
+            return "%s:%s" % (str(job.hour).zfill(2),
+                    str(job.minute).zfill(2))
 
     def schedule_alarm(self, weekday, hour, minute):
         """
