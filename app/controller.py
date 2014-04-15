@@ -45,7 +45,7 @@ def index():
 @app.route('/set_alarm', methods=['POST'])
 def set_alarm():
     alarm_time = request.form.get('time')
-    weekday = get_current_day().weekday()
+    weekday = get_current_day().isoweekday()
     hour, minute = alarm_time.split(":")
 
     scheduler.schedule_alarm(weekday, hour, minute)
@@ -58,7 +58,7 @@ def render_day(day):
     # Set the current day every time we get to this function to ensure that
     # the day persists on form submission.
     set_current_day( get_date_with_day(day) )
-    weekday = get_current_day().weekday()
+    weekday = get_current_day().isoweekday()
 
     # Get the time the alarm is currently set to to render it
     alarm_time = scheduler.get_time_for_day(weekday)
@@ -68,7 +68,7 @@ def render_day(day):
 
     # Render the page
     return render( 'index.html',
-            active_tab=get_current_day().weekday(),
+            active_tab=get_current_day().isoweekday(),
             day=get_current_day_name(),
             time=alarm_time,
             message=random.choice(messages))
