@@ -44,7 +44,7 @@ least link the [NOOBS package](http://www.raspberrypi.org/downloads) I used.
 
 ## Step 2: Get the Wifi interface up on your Raspberry Pi
 I used [this guide](http://www.howtogeek.com/167425/how-to-setup-wi-fi-on-your-raspberry-pi-via-the-command-line/),
-substituting nano for vi because I'm a VIM guy.
+substituting vi for nano because I'm a VIM guy.
 
 ## Step 3: Install Prerequisites
 Install `git` and `screen` so we can check out the code and run it in the
@@ -68,7 +68,7 @@ cd pi_alarm_env
 ```
 Next, check out the project from git, and install the python libraries:
 ```
-git clone git@bitbucket.org:andrewjpierce/pi_alarm.git
+git clone https://github.com/ajpierce/pi_alarm.git
 ./pi_alarm/script/setup.sh
 ```
 

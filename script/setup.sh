@@ -12,6 +12,7 @@ python_libs=(
     'uwsgi'                     # for serving the site
     'Flask-BasicAuth'           # for locking down the site
     'python-crontab'            # for accessing the crontab
+    'RPi.GPIO'                  # for driving the GPIO pins on the Pi
 )
 
 # Install each of the libraries
