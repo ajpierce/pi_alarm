@@ -9,7 +9,7 @@ class Scheduler(object):
     Operates both the scheduler and persisting the data
     """
     def __init__(self):
-        self.cron = CronTab()
+        self.cron = CronTab(user=True)
 
     def get_time_for_day(self, weekday):
         """

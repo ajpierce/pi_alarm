@@ -11,7 +11,7 @@ python_libs=(
     'flask-mako'                # Flask integration for Mako
     'uwsgi'                     # for serving the site
     'Flask-BasicAuth'           # for locking down the site
-    'python-crontab'            # for accessing the crontab
+    'python-crontab==2.1.1'     # for accessing the crontab
     'RPi.GPIO'                  # for driving the GPIO pins on the Pi
 )
 
